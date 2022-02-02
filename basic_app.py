@@ -1,4 +1,5 @@
 
+from time import time
 from flask import Flask, render_template, request, redirect, session
 
 # python modules for data manipulation and visualization
@@ -16,12 +17,6 @@ matplotlib.use('Agg')
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
-import uuid
-
-# local python files
-# from keys import client_id, client_secret
-
-# port = 5000
 
 
 def top_tracks_cleaner(data):
@@ -75,16 +70,7 @@ def track_string_format():
 	return dict(delengthener=delengthener)
 
 
-
-# TEST  --------
-
 cache_handler = spotipy.cache_handler.MemoryCacheHandler()
-
-
-# ENDTEST -------
-
-
-
 
 # spotipy authentification object
 auth_manager = SpotifyOAuth(
@@ -99,7 +85,6 @@ auth_manager = SpotifyOAuth(
 	cache_handler=cache_handler
 	)
 
-uid = str(uuid.uuid4())
 
 # home route. renders index.html 
 @app.route('/', methods=['GET', 'POST'])
@@ -109,7 +94,7 @@ def home():
 	if request.args.get('code'):
 		
 		# this saves the auth token into a session object
-		session[uid] = request.args.get('code')
+		session['access_token'] = request.args.get('code')
 
 		return redirect('/user_data')
 
@@ -120,22 +105,8 @@ def home():
 def user_data():
 
 		
-	auth_manager.get_access_token(code=session[uid], as_dict=True)
+	auth_manager.get_access_token(code=session['access_token'], as_dict=True)
 	sp = spotipy.Spotify(auth_manager=auth_manager)
-
-	time_ranges =['short_term', 'medium_term', 'long_term']
-
-	tracks ={}
-	# calling for the user data and simultaneously cleaning/framing
-	for i in time_ranges:
-		tracks[i] = pd.DataFrame(top_tracks_cleaner(
-				sp.current_user_top_tracks(limit=50, time_range=i)))
-
-	artists = {}
-	# calling for the user data and simultaneously cleaning/framing
-	for i in time_ranges:
-		artists[i] = pd.DataFrame(top_artists_cleaner(
-				sp.current_user_top_artists(limit=50, time_range=i)))
 
 	if not request.args.get('time_range'):
 		return redirect('/user_data?time_range=short_term&search=tracks')
@@ -153,7 +124,9 @@ def user_data():
 
 		# api call to get top songs in some range, clean and set as artist_df
 		time_range = request.args['time_range']
-		track_df = tracks[time_range]
+		
+		track_df = pd.DataFrame(top_tracks_cleaner(
+				sp.current_user_top_tracks(limit=50, time_range=time_range)))
 
 		# saving IDs for future calls
 		id_list = track_df['id'].to_list()
@@ -201,8 +174,9 @@ def user_data():
 
 		# api call to get top songs in some range, clean and set as artist_df
 		time_range = request.args['time_range']
-		artist_df = artists[time_range]	
-
+		
+		artist_df = pd.DataFrame(top_artists_cleaner(
+				sp.current_user_top_artists(limit=50, time_range=time_range)))
 
 		# collecting genres
 		genre_dict = {}
