@@ -108,7 +108,7 @@ def home():
 def user_data():
 	
 	# auth_manager.get_access_token(session.get('access_token'))
-	sp = spotipy.Spotify(auth_manager=auth_manager)
+	sp = spotipy.Spotify(auth_manager=auth_manager, cache_path='cache.txt')
 
 	if not request.args.get('time_range'):
 		return redirect('/user_data?time_range=short_term&search=tracks')
