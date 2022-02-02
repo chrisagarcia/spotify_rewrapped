@@ -56,7 +56,8 @@ def top_artists_cleaner(data):
 
 app = Flask(__name__)
 app.secret_key = 'wowza'
-session.clear()
+if session:
+	session.clear()
 
 
 # function passed to jinja
