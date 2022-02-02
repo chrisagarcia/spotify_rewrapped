@@ -7,6 +7,8 @@ import mpld3
 import seaborn as sns
 import matplotlib
 
+import os
+
 # this fixes the problem with threading in matplotlib
 matplotlib.use('Agg')
 
@@ -15,7 +17,7 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 # local python files
-from keys import client_id, client_secret
+# from keys import client_id, client_secret
 
 port = 5000
 
@@ -80,9 +82,9 @@ auth_manager = SpotifyOAuth(
 	'user-read-recently-played',
 	'user-library-read'
 	],
-	client_id=client_id,
-	client_secret=client_secret,
-	redirect_uri=f"http://127.0.0.1:{port}",
+	client_id=os.environ['CLIENT_ID'],
+	client_secret=os.environ['CLIENT_SECRET'],
+	redirect_uri=f"https://spotify-test-deployment.herokuapp.com/",
 	show_dialog=True
 	)
 
