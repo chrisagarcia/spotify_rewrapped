@@ -108,7 +108,7 @@ def home():
 		# this saves the auth token into a session object
 		session['access_token'] = request.args.get('code')
 		with open('cache.txt', 'w') as cache:
-			cache.write(request.args)
+			cache.write(str(request.args))
 			
 
 		return redirect('/user_data')
