@@ -12,6 +12,7 @@ scipy = "*"
 seaborn = "*"
 gunicorn = "*"
 flask-session = "*"
+uuid = "*"
 
 [dev-packages]
 

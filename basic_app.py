@@ -16,6 +16,8 @@ matplotlib.use('Agg')
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
+import uuid
+
 # local python files
 # from keys import client_id, client_secret
 
@@ -55,7 +57,7 @@ def top_artists_cleaner(data):
 
 
 app = Flask(__name__)
-app.secret_key = 'wowza'
+app.secret_key = os.urandom(64)
 
 
 # function passed to jinja
@@ -97,6 +99,7 @@ auth_manager = SpotifyOAuth(
 	cache_handler=cache_handler
 	)
 
+uid = str(uuid.uuid4())
 
 # home route. renders index.html 
 @app.route('/', methods=['GET', 'POST'])
@@ -106,7 +109,7 @@ def home():
 	if request.args.get('code'):
 		
 		# this saves the auth token into a session object
-		session['access_token'] = request.args.get('code')
+		session[uid] = request.args.get('code')
 
 		return redirect('/user_data')
 
@@ -117,7 +120,7 @@ def home():
 def user_data():
 
 		
-	auth_manager.get_access_token(code=session['access_token'], as_dict=True)
+	auth_manager.get_access_token(code=session[uid], as_dict=True)
 	sp = spotipy.Spotify(auth_manager=auth_manager)
 
 	time_ranges =['short_term', 'medium_term', 'long_term']
