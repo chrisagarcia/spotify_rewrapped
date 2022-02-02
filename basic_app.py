@@ -1,14 +1,11 @@
 
-from time import time
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, url_for
 
 # python modules for data manipulation and visualization
 import pandas as pd
 import mpld3
 import seaborn as sns
 import matplotlib
-
-import os
 
 # this fixes the problem with threading in matplotlib
 matplotlib.use('Agg')
@@ -94,9 +91,9 @@ def home():
 	if request.args.get('code'):
 		
 		# this saves the auth token into a session object
-		session['access_token'] = request.args.get('code')
+		code = request.args.get('code')
 
-		return redirect('/user_data')
+		return redirect(url_for('user_data', code=code))
 
 	# initial load in template this renders essentially only renders on the first load
 	return render_template('index.html')
@@ -104,12 +101,12 @@ def home():
 @app.route('/user_data')
 def user_data():
 
-		
-	auth_manager.get_access_token(code=session['access_token'], as_dict=True)
+	code = request.args['code']
+	auth_manager.get_access_token(code=code, as_dict=True)
 	sp = spotipy.Spotify(auth_manager=auth_manager)
 
 	if not request.args.get('time_range'):
-		return redirect('/user_data?time_range=short_term&search=tracks')
+		return redirect(url_for('user_data', code=code, time_range='short_term', search='tracks'))
 
 	# checks url for a num argument and assigns num variable to the arg
 	# default is 10
@@ -165,7 +162,8 @@ def user_data():
 			plots=histogram_svg_elements,
 			data=merged,
 			time=time_range,
-			num=num
+			num=num,
+			code=code
 			)
 
 	
@@ -199,7 +197,8 @@ def user_data():
 		# 	'user_data_artists.html',
 		# 	data=artist_df,
 		# 	time=time_range,
-		#	num=num
+		#	num=num,
+		#   code=code
 		# 	)
 
 
