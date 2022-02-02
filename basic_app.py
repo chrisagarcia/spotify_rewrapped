@@ -116,16 +116,7 @@ def home():
 @app.route('/user_data')
 def user_data():
 
-	memory_cache = spotipy.cache_handler.MemoryCacheHandler(token_info={
-		"access_token": str(session['access_token']),
-		"token_type": "Bearer",
-		"expires_in": 3600,
-		"refresh_token": "AQAQIFFciOeFXL-X2NDj5ItSuTrVqPZ6MkFKh3wy-eWz1xrDRaLg2-QLrRr-v14Ib_KQGFM1PqYyEubZUSTfcTzOb7Sb18OnYWqXQaGLC-puTDWUKLIeWmsz1xhlTxw0pBs",
-		"scope": "user-library-read user-read-recently-played user-top-read",
-		"expires_at": 1643769276
-		})
-
-	
+		
 	auth_manager.get_access_token(code=session['access_token'], as_dict=True)
 	sp = spotipy.Spotify(auth_manager=auth_manager)
 
