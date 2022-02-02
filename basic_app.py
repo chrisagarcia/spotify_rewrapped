@@ -17,9 +17,9 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 # local python files
-# from keys import client_id, client_secret
+from keys import client_id, client_secret
 
-# port = 5000
+port = 5000
 
 
 def top_tracks_cleaner(data):
@@ -76,7 +76,7 @@ def track_string_format():
 
 # TEST  --------
 
-cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path='cache.txt')
+cache_handler = spotipy.cache_handler.MemoryCacheHandler()
 
 
 # ENDTEST -------
@@ -90,9 +90,9 @@ auth_manager = SpotifyOAuth(
 	'user-read-recently-played',
 	'user-library-read'
 	],
-	client_id=os.environ['CLIENT_ID'],
-	client_secret=os.environ['CLIENT_SECRET'],
-	redirect_uri=f"https://spotify-test-deployment.herokuapp.com/",
+	client_id=client_id,
+	client_secret=client_secret,
+	redirect_uri=f"http://127.0.0.1:{port}",
 	show_dialog=True,
 	cache_handler=cache_handler
 	)
@@ -107,8 +107,10 @@ def home():
 		
 		# this saves the auth token into a session object
 		session['access_token'] = request.args.get('code')
-		with open('cache.txt', 'w') as cache:
-			cache.write(str(request.args))
+		
+		# with open('cache.txt', 'w') as cache:
+		# 	cache.write(str(session.get('access_token')))
+		# 	return redirect('/user_data')
 			
 
 		return redirect('/user_data')
@@ -119,10 +121,25 @@ def home():
 @app.route('/user_data')
 def user_data():
 	
-	with open('cache.txt', 'r') as cache:
-		auth_manager.get_access_token(cache.read())
+	# with open('cache.txt', 'r') as cache:
+	# 	cached_args = cache.read()
+	# 	pass
+
+	memory_cache = spotipy.cache_handler.MemoryCacheHandler(token_info={
+		"access_token": str(session['access_token']),
+		"token_type": "Bearer",
+		"expires_in": 3600,
+		"refresh_token": "AQAQIFFciOeFXL-X2NDj5ItSuTrVqPZ6MkFKh3wy-eWz1xrDRaLg2-QLrRr-v14Ib_KQGFM1PqYyEubZUSTfcTzOb7Sb18OnYWqXQaGLC-puTDWUKLIeWmsz1xhlTxw0pBs",
+		"scope": "user-library-read user-read-recently-played user-top-read",
+		"expires_at": 1643769276
+		})
+
+	
+	auth_manager.get_access_token(code=session['access_token'], as_dict=True)
 	sp = spotipy.Spotify(auth_manager=auth_manager)
-	os.remove('cache.txt')
+	
+
+	# os.remove('cache.txt')
 
 	if not request.args.get('time_range'):
 		return redirect('/user_data?time_range=short_term&search=tracks')
@@ -146,7 +163,7 @@ def user_data():
 			top_tracks_cleaner(
 				sp.current_user_top_tracks(limit=50, time_range=time_range)))
 
-
+		
 		# saving IDs for future calls
 		id_list = df['id'].to_list()
 
@@ -242,4 +259,4 @@ def login_function():
 
 
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run(debug=True, port=port)
