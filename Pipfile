@@ -11,6 +11,7 @@ mpld3 = "*"
 scipy = "*"
 seaborn = "*"
 gunicorn = "*"
+"flask.ext" = "*"
 
 [dev-packages]
 
