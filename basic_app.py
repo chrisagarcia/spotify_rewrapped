@@ -120,6 +120,22 @@ def user_data():
 	auth_manager.get_access_token(code=session['access_token'], as_dict=True)
 	sp = spotipy.Spotify(auth_manager=auth_manager)
 
+	time_ranges =['short_term', 'medium_term', 'long_term']
+
+	tracks ={}
+	# calling for the user data and simultaneously cleaning/framing
+	for i in time_ranges:
+		tracks[i] = pd.DataFrame(top_tracks_cleaner(
+				sp.current_user_top_tracks(limit=50, time_range=i)))
+
+	artists = {}
+	# calling for the user data and simultaneously cleaning/framing
+	for i in time_ranges:
+		artists[i] = pd.DataFrame(top_artists_cleaner(
+				sp.current_user_top_artists(limit=50, time_range=i)))
+
+	session.clear()
+
 	if not request.args.get('time_range'):
 		return redirect('/user_data?time_range=short_term&search=tracks')
 
@@ -134,24 +150,19 @@ def user_data():
 	# return your top tracks and a matplot viz
 	if request.args.get('search') == 'tracks':
 
-		# api call to get top songs in some range, clean and set as df
+		# api call to get top songs in some range, clean and set as artist_df
 		time_range = request.args['time_range']
-
-		# calling for the user data and simultaneously cleaning/framing
-		df = pd.DataFrame(
-			top_tracks_cleaner(
-				sp.current_user_top_tracks(limit=50, time_range=time_range)))
-
+		track_df = tracks[time_range]
 
 		# saving IDs for future calls
-		id_list = df['id'].to_list()
+		id_list = track_df['id'].to_list()
 
 		# api call to grab the features of those songs from their IDs
 		features_json = sp.audio_features(id_list)
-		features_df = pd.DataFrame(features_json)
+		features_artist_df = pd.DataFrame(features_json)
 
-		# merge the two df on their ID
-		merged = pd.merge(df, features_df).drop(labels=['uri', 'track_href', 'analysis_url', 'duration_ms'], axis=1)
+		# merge the two artist_df on their ID
+		merged = pd.merge(track_df, features_artist_df).drop(labels=['uri', 'track_href', 'analysis_url', 'duration_ms'], axis=1)
 
 
 		# plotting each feature / saving the svg in a dictionary
@@ -187,18 +198,14 @@ def user_data():
 	#return your top artists
 	if request.args.get('search') == 'artists':
 
-		# api call to get top songs in some range, clean and set as df
+		# api call to get top songs in some range, clean and set as artist_df
 		time_range = request.args['time_range']
-
-		# calling for the user data and simultaneously cleaning/framing
-		df = pd.DataFrame(
-			top_artists_cleaner(
-				sp.current_user_top_artists(limit=50, time_range=time_range)))
+		artist_df = artists[time_range]	
 
 
 		# collecting genres
 		genre_dict = {}
-		for genre_list in df['genres'].to_list():
+		for genre_list in artist_df['genres'].to_list():
 			for genre in genre_list:
 				for word in genre.split():
 					if word not in genre_dict:
@@ -215,7 +222,7 @@ def user_data():
 		return str(top_10_genre_2dlist) 
 		# render_template(
 		# 	'user_data_artists.html',
-		# 	data=df,
+		# 	data=artist_df,
 		# 	time=time_range,
 		#	num=num
 		# 	)
