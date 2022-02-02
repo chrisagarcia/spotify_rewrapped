@@ -11,8 +11,6 @@ mpld3 = "*"
 scipy = "*"
 seaborn = "*"
 gunicorn = "*"
-"flask.ext" = "*"
-flask-session = "*"
 
 [dev-packages]
 

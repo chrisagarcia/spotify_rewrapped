@@ -1,8 +1,5 @@
 
-from flask import Flask, render_template, request, redirect, session, url_for
-
-# TEST
-from flask.ext.session import Session
+from flask import Flask, render_template, request, redirect, session
 
 # python modules for data manipulation and visualization
 import pandas as pd
@@ -59,7 +56,6 @@ def top_artists_cleaner(data):
 
 app = Flask(__name__)
 app.secret_key = 'wowza'
-Session(app)
 
 
 # function passed to jinja
@@ -122,6 +118,7 @@ def user_data():
 	
 	auth_manager.get_access_token(session.get('access_token'))
 	sp = spotipy.Spotify(auth_manager=auth_manager)
+	os.remove('cache.txt')
 
 	if not request.args.get('time_range'):
 		return redirect('/user_data?time_range=short_term&search=tracks')
