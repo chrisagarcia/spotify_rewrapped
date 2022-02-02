@@ -1,6 +1,9 @@
 
 from flask import Flask, render_template, request, redirect, session, url_for
 
+# TEST
+from flask.ext.session import Session
+
 # python modules for data manipulation and visualization
 import pandas as pd
 import mpld3
@@ -56,6 +59,7 @@ def top_artists_cleaner(data):
 
 app = Flask(__name__)
 app.secret_key = 'wowza'
+Session(app)
 
 
 # function passed to jinja
