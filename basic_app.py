@@ -56,6 +56,7 @@ def top_artists_cleaner(data):
 
 app = Flask(__name__)
 app.secret_key = 'wowza'
+session.clear()
 
 
 # function passed to jinja
@@ -133,8 +134,6 @@ def user_data():
 	for i in time_ranges:
 		artists[i] = pd.DataFrame(top_artists_cleaner(
 				sp.current_user_top_artists(limit=50, time_range=i)))
-
-	session.clear()
 
 	if not request.args.get('time_range'):
 		return redirect('/user_data?time_range=short_term&search=tracks')
