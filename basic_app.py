@@ -7,6 +7,8 @@ import mpld3
 import seaborn as sns
 import matplotlib
 
+import os
+
 # this fixes the problem with threading in matplotlib
 matplotlib.use('Agg')
 
