@@ -74,6 +74,14 @@ def track_string_format():
 
 
 
+# TEST  --------
+
+# cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path='cache.txt')
+
+
+# ENDTEST -------
+
+
 
 
 # spotipy authentification object
@@ -85,7 +93,8 @@ auth_manager = SpotifyOAuth(
 	client_id=os.environ['CLIENT_ID'],
 	client_secret=os.environ['CLIENT_SECRET'],
 	redirect_uri=f"https://spotify-test-deployment.herokuapp.com/",
-	show_dialog=True
+	show_dialog=True,
+	cache_path='cache.txt'
 	)
 
 
@@ -108,7 +117,7 @@ def home():
 def user_data():
 	
 	# auth_manager.get_access_token(session.get('access_token'))
-	sp = spotipy.Spotify(auth_manager=auth_manager, cache_path='cache.txt')
+	sp = spotipy.Spotify(auth_manager=auth_manager)
 
 	if not request.args.get('time_range'):
 		return redirect('/user_data?time_range=short_term&search=tracks')
