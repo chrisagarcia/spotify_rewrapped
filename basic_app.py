@@ -76,7 +76,7 @@ def track_string_format():
 
 # TEST  --------
 
-# cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path='cache.txt')
+cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path='cache.txt')
 
 
 # ENDTEST -------
@@ -94,7 +94,7 @@ auth_manager = SpotifyOAuth(
 	client_secret=os.environ['CLIENT_SECRET'],
 	redirect_uri=f"https://spotify-test-deployment.herokuapp.com/",
 	show_dialog=True,
-	cache_path='cache.txt'
+	cache_handler=cache_handler
 	)
 
 
