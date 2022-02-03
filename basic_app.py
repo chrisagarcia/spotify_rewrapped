@@ -108,43 +108,10 @@ def home():
 def user_data():
 
 	code = request.args['code']
-	# auth_manager.get_access_token(code=code, as_dict=True, check_cache=False)
-
-	url = 'https://accounts.spotify.com/api/token'
-	message = f"{client_id}:{client_secret}"
 	
-	messageBytes = message.encode('ascii')
-	base64Bytes = base64.b64encode(messageBytes)
-	base64Message = base64Bytes.decode('ascii')
-	payload = {
-		'form': {
-			'code': code,
-			'redirect_uri': f"https://spotify-test-deployment.herokuapp.com/",
-			'grant_type': 'authorization_code',
-			},
-		'headers': {
-			'Authorization': f'Basic {base64Message}',
-			'Content-Type': 'application/x-www-form-urlencoded'
-			},
-		'json': True
-		}
-		
-	r = requests.post(url, headers=payload['headers'], data=payload['form'])
-	json = dict(r.json())
-	
-	token = {
-		'access_token': json[list(json.keys())[0]],
-		'token_type': 'Bearer',
-		"expires_in": 3600,
-		"refresh_token": "AQCk_YigY3OtVbAe4kVhqqRhn-sa9WPaYBdeff179dIeL1JmgZhkozlIlA-3iSA1UVFhLQRVDY_aug5AMKdlTtyyJXAN0lSn7Izm3PxMmnypVU8H4XRISJYyTeAckq7hA-A",
-		"scope": "user-library-read user-read-recently-played user-top-read",
-		"expires_at": 1643851318
-		}
-
-
-
-	auth_manager.validate_token(token)
-	sp = spotipy.Spotify(auth_manager=auth_manager)
+	token_info = auth_manager.get_access_token(code)
+	access_token = token_info['access_token']
+	sp = spotipy.Spotify(access_token)
 
 	if not request.args.get('time_range'):
 		return redirect(url_for('user_data', code=code, time_range='short_term', search='tracks'))
