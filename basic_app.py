@@ -17,6 +17,10 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 
+import requests
+import base64
+import json
+
 
 def top_tracks_cleaner(data):
 	x = []
@@ -101,16 +105,45 @@ def home():
 def user_data():
 
 	code = request.args['code']
-	auth_manager.get_access_token(code=code, as_dict=True)
+	# auth_manager.get_access_token(code=code, as_dict=True, check_cache=False)
+
+	url = 'https://accounts.spotify.com/api/token'
+	message = f"{client_id}:{client_secret}"
+	
+	messageBytes = message.encode('ascii')
+	base64Bytes = base64.b64encode(messageBytes)
+	base64Message = base64Bytes.decode('ascii')
+	payload = {
+		'form': {
+			'code': code,
+			'redirect_uri': f"http://127.0.0.1:{port}",
+			'grant_type': 'authorization_code',
+			},
+		'headers': {
+			'Authorization': f'Basic {base64Message}',
+			'Content-Type': 'application/x-www-form-urlencoded'
+			},
+		'json': True
+		}
+		
+	r = requests.post(url, headers=payload['headers'], data=payload['form'])
+	json = dict(r.json())
+	
+	token = {
+		'access_token': json[list(json.keys())[0]],
+		'token_type': 'Bearer',
+		"expires_in": 3600, "refresh_token": "AQCk_YigY3OtVbAe4kVhqqRhn-sa9WPaYBdeff179dIeL1JmgZhkozlIlA-3iSA1UVFhLQRVDY_aug5AMKdlTtyyJXAN0lSn7Izm3PxMmnypVU8H4XRISJYyTeAckq7hA-A",
+		"scope": "user-library-read user-read-recently-played user-top-read",
+		"expires_at": 1643851318
+		}
+
+
+
+	auth_manager.validate_token(token)
 	sp = spotipy.Spotify(auth_manager=auth_manager)
 
 	if not request.args.get('time_range'):
-		return redirect(url_for(
-			'user_data',
-			code=code,
-			time_range='short_term',
-			search='tracks'
-			))
+		return redirect(url_for('user_data', code=code, time_range='short_term', search='tracks'))
 
 	# checks url for a num argument and assigns num variable to the arg
 	# default is 10
@@ -161,7 +194,6 @@ def user_data():
 
 		features = merged[['danceability', 'energy', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence']]
 
-
 		return render_template(
 			'user_data.html',
 			plots=histogram_svg_elements,
@@ -197,14 +229,13 @@ def user_data():
 		# ax = sns.barplot(data=top_10_genre_2dlist)
 		# genre_plot = ax.get_figure()
 
-		return str(top_10_genre_2dlist) 
-		# render_template(
-		# 	'user_data_artists.html',
-		# 	data=artist_df,
-		# 	time=time_range,
-		#	num=num,
-		#   code=code
-		# 	)
+		return  render_template(
+			'user_data_artists.html',
+			data=artist_df,
+			time=time_range,
+			num=num,
+			code=code
+			)
 
 
 
