@@ -72,6 +72,9 @@ def track_string_format():
 
 	return dict(delengthener=delengthener)
 
+client_id=os.environ['CLIENT_ID'],
+client_secret=os.environ['CLIENT_SECRET']
+
 
 # spotipy authentification object
 auth_manager = SpotifyOAuth(
@@ -79,8 +82,8 @@ auth_manager = SpotifyOAuth(
 	'user-read-recently-played',
 	'user-library-read'
 	],
-	client_id=os.environ['CLIENT_ID'],
-	client_secret=os.environ['CLIENT_SECRET'],
+	client_id=client_id,
+	client_secret=client_secret,
 	redirect_uri=f"https://spotify-test-deployment.herokuapp.com/",
 	show_dialog=True,
 	)
