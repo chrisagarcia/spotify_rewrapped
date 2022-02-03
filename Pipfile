@@ -13,6 +13,7 @@ seaborn = "*"
 gunicorn = "*"
 flask-session = "*"
 uuid = "*"
+requests = "*"
 
 [dev-packages]
 

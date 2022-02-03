@@ -69,8 +69,6 @@ def track_string_format():
 	return dict(delengthener=delengthener)
 
 
-cache_handler = spotipy.cache_handler.MemoryCacheHandler()
-
 # spotipy authentification object
 auth_manager = SpotifyOAuth(
 	scope=['user-top-read',
@@ -81,7 +79,6 @@ auth_manager = SpotifyOAuth(
 	client_secret=os.environ['CLIENT_SECRET'],
 	redirect_uri=f"https://spotify-test-deployment.herokuapp.com/",
 	show_dialog=True,
-	cache_handler=cache_handler
 	)
 
 
@@ -108,7 +105,12 @@ def user_data():
 	sp = spotipy.Spotify(auth_manager=auth_manager)
 
 	if not request.args.get('time_range'):
-		return redirect(url_for('user_data', code=code, time_range='short_term', search='tracks'))
+		return redirect(url_for(
+			'user_data',
+			code=code,
+			time_range='short_term',
+			search='tracks'
+			))
 
 	# checks url for a num argument and assigns num variable to the arg
 	# default is 10
@@ -158,6 +160,7 @@ def user_data():
 
 
 		features = merged[['danceability', 'energy', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence']]
+
 
 		return render_template(
 			'user_data.html',
