@@ -135,7 +135,8 @@ def user_data():
 	token = {
 		'access_token': json[list(json.keys())[0]],
 		'token_type': 'Bearer',
-		"expires_in": 3600, "refresh_token": "AQCk_YigY3OtVbAe4kVhqqRhn-sa9WPaYBdeff179dIeL1JmgZhkozlIlA-3iSA1UVFhLQRVDY_aug5AMKdlTtyyJXAN0lSn7Izm3PxMmnypVU8H4XRISJYyTeAckq7hA-A",
+		"expires_in": 3600,
+		"refresh_token": "AQCk_YigY3OtVbAe4kVhqqRhn-sa9WPaYBdeff179dIeL1JmgZhkozlIlA-3iSA1UVFhLQRVDY_aug5AMKdlTtyyJXAN0lSn7Izm3PxMmnypVU8H4XRISJYyTeAckq7hA-A",
 		"scope": "user-library-read user-read-recently-played user-top-read",
 		"expires_at": 1643851318
 		}
