@@ -107,7 +107,7 @@ def home():
 @app.route('/user_data')
 def user_data():
 
-	code = request.args['code']
+	code = auth_manager.parse_response_code(request)
 	
 	token_info = auth_manager.get_access_token(code)
 	access_token = token_info['access_token']
