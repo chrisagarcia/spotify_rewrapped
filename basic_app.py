@@ -119,7 +119,7 @@ def user_data():
 	payload = {
 		'form': {
 			'code': code,
-			'redirect_uri': f"http://127.0.0.1:{port}",
+			'redirect_uri': f"https://spotify-test-deployment.herokuapp.com/",
 			'grant_type': 'authorization_code',
 			},
 		'headers': {
