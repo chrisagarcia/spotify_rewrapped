@@ -1,5 +1,5 @@
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, make_response
 
 # python modules for data manipulation and visualization
 import pandas as pd
@@ -98,8 +98,10 @@ def home():
 		
 		# this saves the auth token into a session object
 		code = request.args.get('code')
+		resp = make_response(redirect('user_data'))
+		resp.set_cookies('code', code)
 
-		return redirect(url_for('user_data', code=code))
+		return resp
 
 	# initial load in template this renders essentially only renders on the first load
 	return render_template('index.html')
@@ -107,10 +109,9 @@ def home():
 @app.route('/user_data')
 def user_data():
 
-	code = auth_manager.parse_response_code(request)
+	code = request.cookies.get('code')
 	
-	token_info = auth_manager.get_access_token(code)
-	access_token = token_info['access_token']
+	auth_manager.get_access_token(code)
 	sp = spotipy.Spotify(access_token)
 
 	if not request.args.get('time_range'):
